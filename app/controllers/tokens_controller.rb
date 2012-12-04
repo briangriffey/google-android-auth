@@ -45,6 +45,15 @@ class TokensController < ApplicationController
     if resp.code == "200"
       # Find a user
       @user = User.where(:email => data["email"]).first
+      
+      if @user.nil?
+        render :status => 401, :json => {:message => "Invalid email or password"}
+        return
+      end
+
+      @user.ensure_authentication_token!
+      render :status => 200, :json => {:token => @user.authentication_token}
+      
     else
       #Create a user with the data we just got back
     end
